@@ -17,8 +17,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
-
-import org.eclipse.wb.swing.FocusTraversalOnArray;
 import java.awt.Component;
 
 
