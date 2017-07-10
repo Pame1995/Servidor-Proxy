@@ -1,0 +1,141 @@
+package proyecto;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+
+import javax.swing.JLabel;
+import java.awt.TextArea;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JScrollPane;
+import javax.swing.JButton;
+
+import org.eclipse.wb.swing.FocusTraversalOnArray;
+import java.awt.Component;
+
+
+public class cliente implements java.awt.event.ActionListener {
+	JTextField textField = new JTextField(40);
+	JFrame frame = new JFrame();
+	TextArea textArea = new TextArea(8,40);
+	String serverAddres="";
+	String mensaje="";
+	BufferedReader in;//Para leer del teclado con el método readLine()
+    PrintWriter out;//Para poder mandar el string leido al servidor
+    private JTextField txtmensaje;
+    /**
+	 * @wbp.parser.entryPoint
+	 */
+	public  cliente() {
+		frame.getContentPane();
+		frame.getContentPane().setLayout(null);
+		textArea.setBounds(42, 87, 388, 120);
+		textArea.setEditable(false);
+		frame.getContentPane().add(textArea);
+		textField.setBounds(103, 11, 139, 33);
+		frame.getContentPane().add(textField);
+		textField.setColumns(10);
+		textField.setEditable(false);
+				
+		JButton btnCancelar = new JButton("Cancelar");
+		btnCancelar.setBounds(224, 228, 103, 33);
+		btnCancelar.setActionCommand("cancelar");
+		frame.getContentPane().add(btnCancelar);
+		btnCancelar.addActionListener(this);
+		
+		JButton btnEnviar = new JButton("Enviar");
+		btnEnviar.setBounds(267, 13, 98, 28);
+		btnEnviar.setActionCommand("Enviar");
+		frame.getContentPane().add(btnEnviar);
+		btnEnviar.addActionListener(this);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(432, 213, -22, -127);
+		frame.getContentPane().add(scrollPane);
+		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBounds(409, 207, -363, -19);
+		frame.getContentPane().add(scrollPane_1);
+		
+		JLabel lblPara = new JLabel("PARA:");
+		lblPara.setBounds(42, 11, 92, 33);
+		lblPara.setEnabled(false);
+		frame.getContentPane().add(lblPara);
+		
+		txtmensaje = new JTextField();
+		txtmensaje.setBounds(42, 55, 388, 26);
+		frame.getContentPane().add(txtmensaje);
+		txtmensaje.setColumns(10);
+		txtmensaje.setEditable(true);
+		
+           
+		
+		}
+		public void actionPerformed(ActionEvent e)
+		{
+			String strAccionDeEscuhar = e.getActionCommand();
+			
+			if(strAccionDeEscuhar.equals("Enviar")) //si escucha el boton enviar
+			{
+				out.println(txtmensaje.getText());//envia el mensaje al servidor 
+				System.out.print("enviando mensaje");
+				txtmensaje.setText("");//limpia txtfile
+			}	
+			if(strAccionDeEscuhar.equals("cancelar"))
+			{
+				System.exit(0);
+			}	
+
+    }
+    
+    /**
+     * Prompt for and return the address of the server.
+     */
+    private String getServerAddress() {
+        return JOptionPane.showInputDialog(
+            frame,
+            "Enter IP Address of the Server:",
+            "Welcome to the Chatter",
+            JOptionPane.QUESTION_MESSAGE);
+    }
+
+    /**
+     * Prompt for and return the desired screen name.
+     */
+    
+
+	public  void run() throws IOException{
+		String serverAddress = getServerAddress();
+		String para= serverAddress;
+		textField.setText(para);
+		Socket clientSocket = new Socket(serverAddress,9000);
+		
+		in = new BufferedReader(new InputStreamReader(
+				 clientSocket.getInputStream())); //lee el socket ingresado.
+		 
+		        out = new PrintWriter(clientSocket.getOutputStream(), true);
+		        while (true) {
+		            String line = in.readLine();//lee los datos enviados de servidor
+		            if (line.startsWith("Mensaje")) {//si hay mensaje
+		            	textArea.append( line + "\n");
+		            }
+		        else if (line.startsWith("Error")) {//si hay palabras restringuidas es aceptado 
+		        	textArea.append(line + "\n");
+		        } 
+		            }
+		        
+	}
+	public static void main(String[] args) throws Exception {
+        cliente client = new cliente();
+        client.frame.setVisible(true);
+        client.run();
+    }
+}
